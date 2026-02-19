@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
-    let audioCtx, activeOsc, activeGain, analyser, vizRAF, melodyTimeout;
-    let isFirstActionTaken = false;
+let audioCtx, activeOsc, activeGain, analyser, vizRAF, melodyTimeout, sweepTimer;    
+let isFirstActionTaken = false;
     
     // Application State
     let currentHz = 49;
@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Safe & Silent Stop All ---
     window.stopAll = function(manualClick = false) {
-        if (melodyTimeout) clearTimeout(melodyTimeout);
+        if (melodyTimeout) clearTimeout(melodyTimeout); if (sweepTimer) clearTimeout(sweepTimer);
         isSongPlaying = false;
         
         // Anti-pop fade out
@@ -208,7 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     [slMedian, slRange, slTime].forEach(el => el.addEventListener('input', updateSweepUI));
 
-    const triggerSweep = () => {
+const triggerSweep = () => {
         const median = parseFloat(slMedian.value);
         const range = parseFloat(slRange.value);
         const time = parseFloat(slTime.value);
@@ -221,19 +221,27 @@ document.addEventListener('DOMContentLoaded', () => {
         activeGain = ctx.createGain();
         analyser = ctx.createAnalyser();
 
-        activeOsc.frequency.setValueAtTime(start, ctx.currentTime);
-        activeOsc.frequency.linearRampToValueAtTime(end, ctx.currentTime + time);
-        
+        // Fade in to prevent pop
         activeGain.gain.setValueAtTime(0, ctx.currentTime);
         activeGain.gain.linearRampToValueAtTime(0.3, ctx.currentTime + 0.05);
-        activeGain.gain.setValueAtTime(0.3, ctx.currentTime + time - 0.05);
-        activeGain.gain.linearRampToValueAtTime(0, ctx.currentTime + time);
         
         activeOsc.connect(activeGain).connect(analyser).connect(ctx.destination);
         activeOsc.start();
-        activeOsc.stop(ctx.currentTime + time + 0.1);
         startViz();
         updateHeaderUI(median, `${APP_TITLE} - Sweeping`);
+
+        // The looping bounce function
+        const sweepCycle = () => {
+            const now = ctx.currentTime;
+            activeOsc.frequency.setValueAtTime(start, now);
+            activeOsc.frequency.linearRampToValueAtTime(end, now + time);
+            activeOsc.frequency.linearRampToValueAtTime(start, now + time * 2);
+            
+            // Re-trigger the cycle right as the bounce finishes
+            sweepTimer = setTimeout(sweepCycle, time * 2 * 1000);
+        };
+        
+        sweepCycle();
     };
 
     [slMedian, slRange, slTime].forEach(el => el.addEventListener('change', triggerSweep));
@@ -303,20 +311,42 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    async function playSongLoop(id) {
+async function playSongLoop(id) {
         isSongPlaying = true;
         const song = SONG_LIBRARY[id];
         
         while (isSongPlaying) {
             for (const note of song.notes) {
                 if (!isSongPlaying) break;
+                
                 const freq = NOTES[note.n] * Math.pow(2, (TRANSPOSE_SEMITONES + song.trim) / 12);
-                if (freq > 0) {
-                    playTone(freq);
-                    updateHeaderUI(freq, `${getNoteLabel(freq)} - ${freq.toFixed(1)} Hz`);
-                } else {
-                    stopAll(); // It's a rest
+                
+                // Gently stop the previous note without killing the global song state
+                if (activeGain && audioCtx) {
+                    const now = audioCtx.currentTime;
+                    activeGain.gain.exponentialRampToValueAtTime(0.001, now + 0.02);
+                    if (activeOsc) {
+                        try { activeOsc.stop(now + 0.03); } catch(e){}
+                    }
                 }
+
+                if (freq > 0) {
+                    const ctx = initAudio();
+                    activeOsc = ctx.createOscillator();
+                    activeGain = ctx.createGain();
+                    if (!analyser) analyser = ctx.createAnalyser();
+
+                    activeOsc.frequency.setValueAtTime(freq, ctx.currentTime);
+                    activeGain.gain.setValueAtTime(0, ctx.currentTime);
+                    activeGain.gain.linearRampToValueAtTime(0.3, ctx.currentTime + 0.05);
+                    
+                    activeOsc.connect(activeGain).connect(analyser).connect(ctx.destination);
+                    activeOsc.start();
+                    startViz();
+                    updateHeaderUI(freq, `${getNoteLabel(freq)} - ${freq.toFixed(1)} Hz`);
+                }
+                
+                // Wait for the note duration before moving to the next
                 await new Promise(r => melodyTimeout = setTimeout(r, note.d));
             }
         }
