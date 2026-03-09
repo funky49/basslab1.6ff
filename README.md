@@ -7,3 +7,4 @@ basslab.science thanks
 "Spooky" Hamilton
 Eric Wright aka "chozo"
 Glen Carter aka "Thee DJ Q"
+Rydell "kr3bstar" Huff
