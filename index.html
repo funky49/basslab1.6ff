@@ -2,105 +2,155 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Oobleck Dance Generator 1.6g</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>BassLab</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <a class="skip" href="#cave">Skip to the cave</a>
 
-    <header id="mainHeader" onclick="stopAll(true)">
-        <canvas id="waveCanvas"></canvas>
-        <div id="freqFill"></div>
-        <div class="header-content">
-            <div id="leftArrow" class="header-arrow">← 25Hz</div>
-            <div id="headerText" class="header-text">
-                <span class="warning-title">WARNING</span><br>
-                <span class="warning-sub">(not gentle to speakers)</span>
+    <header class="topbar">
+        <p class="brand">BassLab</p>
+        <div class="picker">
+            <p class="picker-label" id="themeLabel">Palette</p>
+            <div class="palette-list" role="group" aria-labelledby="themeLabel">
+                <button type="button" data-palette="canadian-rapper" aria-pressed="false">
+                    <span class="swatches" aria-hidden="true">
+                        <span style="background:#93C372"></span>
+                        <span style="background:#E2725B"></span>
+                        <span style="background:#7FDBDA"></span>
+                        <span style="background:#6F2DA8"></span>
+                        <span style="background:#FFFDD0"></span>
+                    </span>
+                    <span class="palette-name">Canadian Rapper</span>
+                </button>
+                <button type="button" data-palette="saved-by-the-80s" aria-pressed="false">
+                    <span class="swatches" aria-hidden="true">
+                        <span style="background:#000000"></span>
+                        <span style="background:#FFFFFF"></span>
+                        <span style="background:#ED1C24"></span>
+                        <span style="background:#FFD700"></span>
+                        <span style="background:#4169E1"></span>
+                    </span>
+                    <span class="palette-name">Saved by the 80s</span>
+                </button>
+                <button type="button" data-palette="saved-by-the-70s" aria-pressed="false">
+                    <span class="swatches" aria-hidden="true">
+                        <span style="background:#D62300"></span>
+                        <span style="background:#FF8732"></span>
+                        <span style="background:#DFA800"></span>
+                        <span style="background:#568203"></span>
+                        <span style="background:#502314"></span>
+                        <span style="background:#F5EBDC"></span>
+                    </span>
+                    <span class="palette-name">Saved by the 70s</span>
+                </button>
+                <button type="button" data-palette="arctic-slate" aria-pressed="false">
+                    <span class="swatches" aria-hidden="true">
+                        <span style="background:#D7DEE4"></span>
+                        <span style="background:#9FB8C4"></span>
+                        <span style="background:#58687A"></span>
+                        <span style="background:#14342B"></span>
+                        <span style="background:#12181F"></span>
+                    </span>
+                    <span class="palette-name">Arctic Slate</span>
+                </button>
+                <button type="button" data-palette="saved-by-the-90s" aria-pressed="false">
+                    <span class="swatches" aria-hidden="true">
+                        <span style="background:#FFDD00"></span>
+                        <span style="background:#9D00FF"></span>
+                        <span style="background:#0082A9"></span>
+                        <span style="background:#FF2E88"></span>
+                        <span style="background:#00AEEF"></span>
+                    </span>
+                    <span class="palette-name">Saved by the 90s</span>
+                </button>
             </div>
-            <div id="rightArrow" class="header-arrow">75Hz →</div>
+            <p class="theme-status" id="themeStatus">BassLab colors</p>
         </div>
     </header>
 
-    <nav class="main-tabs">
-        <button id="tab-generator" class="tab-btn active-tab" onclick="switchMainMode('generator')">Generator Mode</button>
-        <button id="tab-song" class="tab-btn" onclick="switchMainMode('song')">Song Mode</button>
-        <button id="tab-toy" class="tab-btn" onclick="switchMainMode('toy')">Toy Mode</button>
-    </nav>
-
-    <main id="appContent">
-        
-        <section id="mode-generator" class="content-panel active-panel">
-            <nav class="sub-tabs">
-                <button id="sub-tone" class="sub-btn flashing" onclick="setGeneratorMode('tone')">TONE</button>
-                <button id="sub-sweep" class="sub-btn" onclick="setGeneratorMode('sweep')">SWEEP</button>
-                <button id="sub-keyboard" class="sub-btn" onclick="setGeneratorMode('keyboard')">KEYBOARD</button>
-                <button id="sub-off" class="sub-btn off-btn" onclick="stopAll(true)">OFF</button>
-            </nav>
-
-            <div class="generator-workspace">
-                <div id="ui-tone" class="gen-ui active-gen-ui">
-                    <div class="tone-controls">
-                        <button class="nudge-btn" id="btnFreqDown">−</button>
-                        <div class="knob-container" id="mainKnob">
-                            <div class="knob-indicator" id="knobPointer"></div>
-                            <div class="knob-readout">
-                                <span id="toneHzReadout">49.0</span><br><span class="unit">Hz</span>
-                            </div>
+    <main>
+        <div class="stage">
+            <section class="cave" id="cave" aria-label="Cave">
+                <svg class="cave-walls" aria-hidden="true" focusable="false">
+                    <defs>
+                        <pattern id="speaker-tile" width="26" height="26" patternUnits="userSpaceOnUse">
+                            <rect width="26" height="26" fill="var(--bg)"/>
+                            <rect x="2" y="3" width="22" height="20" fill="var(--panel)" stroke="var(--text)" stroke-width="1.5"/>
+                            <circle cx="13" cy="13" r="5.5" fill="none" stroke="var(--highlight)" stroke-width="1.75"/>
+                            <circle cx="13" cy="13" r="2" fill="var(--accent)"/>
+                        </pattern>
+                    </defs>
+                    <rect width="100%" height="100%" fill="url(#speaker-tile)"/>
+                </svg>
+                <div class="cave-room">
+                    <img class="sprite" src="assets/funky49.svg" width="24" height="28" alt="funky49, an original 8-bit nerdcore rapper in a white, blue, and red baseball jersey and blue track pants">
+                    <h1 class="cave-line">It's Dangerous to Bass Alone! Take this.</h1>
+                    <div class="choices">
+                        <div class="takes">
+                            <p class="take">
+                                <span class="take-name">Google Play</span>
+                                <span class="take-note">Coming later</span>
+                            </p>
+                            <a class="take" href="app/">Web App</a>
                         </div>
-                        <button class="nudge-btn" id="btnFreqUp">+</button>
+                        <ul class="later">
+                            <li>Apple App Store <span>Coming later</span></li>
+                            <li>Mac App Store <span>Coming later</span></li>
+                            <li>Microsoft Store <span>Coming later</span></li>
+                            <li>itch.io <span>Coming later</span></li>
+                        </ul>
                     </div>
+                    <img class="sprite hero-sprite" src="assets/hero.svg" width="24" height="24" alt="Original 8-bit hero in a cap and tunic">
                 </div>
+            </section>
 
-                <div id="ui-sweep" class="gen-ui">
-                    <div class="sweep-controls">
-                        <div class="slider-group">
-                            <label>Median Freq: <span id="valMedian">49</span> Hz</label>
-                            <input type="range" id="slMedian" min="35" max="65" step="0.5" value="49">
-                        </div>
-                        <div class="slider-group">
-                            <label>Freq Range Span: <span id="valRange">6</span> Hz</label>
-                            <input type="range" id="slRange" min="3" max="10" step="0.5" value="6">
-                        </div>
-                        <div class="slider-group">
-                            <label>Sweep Time: <span id="valTime">7</span> s</label>
-                            <input type="range" id="slTime" min="3" max="10" step="0.5" value="7">
-                        </div>
-                        <p class="sweep-hint">Slide and release to trigger sweep.</p>
-                    </div>
-                </div>
-
-                <div id="ui-keyboard" class="gen-ui">
-                    <div id="pianoContainer"></div>
-                </div>
-            </div>
-        </section>
-
-        <section id="mode-song" class="content-panel">
-            <div class="grid-8" id="songGrid">
-                </div>
-        </section>
-
-        <section id="mode-toy" class="content-panel">
-            <div class="grid-8">
-                <button class="toy-btn" onclick="triggerToyMacro('rise')">Bass Rise</button>
-                <button class="toy-btn" onclick="triggerToyMacro('drop')">mmm Drop</button>
-                <button class="toy-btn" onclick="stopAll(true)">TBD Audio Loop</button>
-                <button class="toy-btn" onclick="stopAll(true)">TBD Audio Loop</button>
-                <button class="toy-btn" onclick="stopAll(true)">TBD Audio Loop</button>
-                <button class="toy-btn" onclick="stopAll(true)">TBD Audio Loop</button>
-                <button class="toy-btn" onclick="stopAll(true)">TBD</button>
-                <button class="toy-btn" onclick="showReadme()">Info & Thanks</button>
-            </div>
-            <div id="readmeDisplay" class="readme-box hidden"></div>
-        </section>
-
+            <section class="gear" aria-labelledby="gear-heading">
+                <h2 id="gear-heading">Gear</h2>
+                <p class="disclosure">BassLab is a participant in the Amazon Associates Program and earns from qualifying purchases. These are affiliate links.</p>
+                <ul class="gear-list">
+                    <li>
+                        <article class="gear-card">
+                            <img src="assets/gear/bt-amp.jpg" width="522" height="272" alt="Dayton Audio DTA-2.1BT2 desktop amplifier">
+                            <h3 class="gear-label">BT amp</h3>
+                            <p class="gear-name">Dayton Audio DTA-2.1BT2 200W 2.1 Channel Class D Bluetooth Desktop Amp</p>
+                            <p><a class="gear-url" href="https://link.amazon/B04AD2VXs" target="_blank" rel="nofollow sponsored noopener">https://link.amazon/B04AD2VXs</a></p>
+                        </article>
+                    </li>
+                    <li>
+                        <article class="gear-card">
+                            <img src="assets/gear/subwoofer.jpg" width="522" height="522" alt="GRS 12SW-4 12 inch poly cone subwoofer">
+                            <h3 class="gear-label">12&quot; subwoofer</h3>
+                            <p class="gear-name">GRS 12SW-4 12&quot; Poly Cone Subwoofer 4 Ohm</p>
+                            <p><a class="gear-url" href="https://link.amazon/B0c2mIcn5" target="_blank" rel="nofollow sponsored noopener">https://link.amazon/B0c2mIcn5</a></p>
+                        </article>
+                    </li>
+                    <li>
+                        <article class="gear-card">
+                            <img src="assets/gear/speaker-box.jpg" width="522" height="353" alt="Goldwood TR12S sealed speaker cabinet">
+                            <h3 class="gear-label">speaker box</h3>
+                            <p class="gear-name">Goldwood TR12S 12&quot; Single Sealed Box Speaker Cabinet</p>
+                            <p><a class="gear-url" href="https://link.amazon/B0gtIllta" target="_blank" rel="nofollow sponsored noopener">https://link.amazon/B0gtIllta</a></p>
+                        </article>
+                    </li>
+                    <li>
+                        <article class="gear-card">
+                            <img src="assets/gear/banana-wire.jpg" width="522" height="522" alt="Audtek braided speaker cable with gold plated banana plugs">
+                            <h3 class="gear-label">banana wire</h3>
+                            <p class="gear-name">Audtek 6 ft. 14 AWG Professional Grade Braided Speaker Cable Wire with Gold Plated Banana Plugs</p>
+                            <p><a class="gear-url" href="https://link.amazon/B0gwgxdSu" target="_blank" rel="nofollow sponsored noopener">https://link.amazon/B0gwgxdSu</a></p>
+                        </article>
+                    </li>
+                </ul>
+            </section>
+        </div>
     </main>
 
-    <footer id="mainFooter">
-        <button class="global-stop-btn" onclick="stopAll(true)">STOP ALL AUDIO</button>
+    <footer class="site-footer">
+        <p><a href="https://sparkflorida.org" target="_blank" rel="noopener">Another idea from Spark it the Dark Florida</a></p>
     </footer>
 
-    <script src="songs.js"></script>
-    <script src="script.js"></script>
+    <script src="theme.js"></script>
 </body>
 </html>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Oobleck Dance Generator 1.6g</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header id="mainHeader" onclick="stopAll(true)">
+        <canvas id="waveCanvas"></canvas>
+        <div id="freqFill"></div>
+        <div class="header-content">
+            <div id="leftArrow" class="header-arrow">← 25Hz</div>
+            <div id="headerText" class="header-text">
+                <span class="warning-title">WARNING</span><br>
+                <span class="warning-sub">(not gentle to speakers)</span>
+            </div>
+            <div id="rightArrow" class="header-arrow">75Hz →</div>
+        </div>
+    </header>
+
+    <nav class="main-tabs">
+        <button id="tab-generator" class="tab-btn active-tab" onclick="switchMainMode('generator')">Generator Mode</button>
+        <button id="tab-song" class="tab-btn" onclick="switchMainMode('song')">Song Mode</button>
+        <button id="tab-toy" class="tab-btn" onclick="switchMainMode('toy')">Toy Mode</button>
+    </nav>
+
+    <main id="appContent">
+        
+        <section id="mode-generator" class="content-panel active-panel">
+            <nav class="sub-tabs">
+                <button id="sub-tone" class="sub-btn flashing" onclick="setGeneratorMode('tone')">TONE</button>
+                <button id="sub-sweep" class="sub-btn" onclick="setGeneratorMode('sweep')">SWEEP</button>
+                <button id="sub-keyboard" class="sub-btn" onclick="setGeneratorMode('keyboard')">KEYBOARD</button>
+                <button id="sub-off" class="sub-btn off-btn" onclick="stopAll(true)">OFF</button>
+            </nav>
+
+            <div class="generator-workspace">
+                <div id="ui-tone" class="gen-ui active-gen-ui">
+                    <div class="tone-controls">
+                        <button class="nudge-btn" id="btnFreqDown">−</button>
+                        <div class="knob-container" id="mainKnob">
+                            <div class="knob-indicator" id="knobPointer"></div>
+                            <div class="knob-readout">
+                                <span id="toneHzReadout">49.0</span><br><span class="unit">Hz</span>
+                            </div>
+                        </div>
+                        <button class="nudge-btn" id="btnFreqUp">+</button>
+                    </div>
+                </div>
+
+                <div id="ui-sweep" class="gen-ui">
+                    <div class="sweep-controls">
+                        <div class="slider-group">
+                            <label>Median Freq: <span id="valMedian">49</span> Hz</label>
+                            <input type="range" id="slMedian" min="35" max="65" step="0.5" value="49">
+                        </div>
+                        <div class="slider-group">
+                            <label>Freq Range Span: <span id="valRange">6</span> Hz</label>
+                            <input type="range" id="slRange" min="3" max="10" step="0.5" value="6">
+                        </div>
+                        <div class="slider-group">
+                            <label>Sweep Time: <span id="valTime">7</span> s</label>
+                            <input type="range" id="slTime" min="3" max="10" step="0.5" value="7">
+                        </div>
+                        <p class="sweep-hint">Slide and release to trigger sweep.</p>
+                    </div>
+                </div>
+
+                <div id="ui-keyboard" class="gen-ui">
+                    <div id="pianoContainer"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="mode-song" class="content-panel">
+            <div class="grid-8" id="songGrid">
+                </div>
+        </section>
+
+        <section id="mode-toy" class="content-panel">
+            <div class="grid-8">
+                <button class="toy-btn" onclick="triggerToyMacro('rise')">Bass Rise</button>
+                <button class="toy-btn" onclick="triggerToyMacro('drop')">mmm Drop</button>
+                <button class="toy-btn" onclick="stopAll(true)">TBD Audio Loop</button>
+                <button class="toy-btn" onclick="stopAll(true)">TBD Audio Loop</button>
+                <button class="toy-btn" onclick="stopAll(true)">TBD Audio Loop</button>
+                <button class="toy-btn" onclick="stopAll(true)">TBD Audio Loop</button>
+                <button class="toy-btn" onclick="stopAll(true)">TBD</button>
+                <button class="toy-btn" onclick="showReadme()">Info & Thanks</button>
+            </div>
+            <div id="readmeDisplay" class="readme-box hidden"></div>
+        </section>
+
+    </main>
+
+    <footer id="mainFooter">
+        <button class="global-stop-btn" onclick="stopAll(true)">STOP ALL AUDIO</button>
+    </footer>
+
+    <script src="songs.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
